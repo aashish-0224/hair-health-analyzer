@@ -1,9 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+import os
 
-DATABASE_URL = "mysql+mysqlconnector://root:Aashish%40123@localhost/hair_analyzer"
+# Use SQLite by default for easier deployment.
+# If DATABASE_URL is set in the environment (e.g. to a cloud MySQL URL),
+# it will override the default.
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./hair_analyzer.db")
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
